@@ -1,4 +1,4 @@
 # AI_Search
-:blush: Hello mọi người\n
-:imp: Thằng nào đọc code đưa t 100k \n
+:blush: Hello mọi người <br>
+:imp: Thằng nào đọc code đưa t 100k <br>
 :heart: Miễn phí cho bạn nào là nữ <3
