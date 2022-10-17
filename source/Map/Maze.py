@@ -7,12 +7,10 @@ Maze.py có các chức năng như:
 '''
 
 # Thư viện sử dụng
-import os
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from numpy import square
 import MazeCreated as mc
 import pygame
-from time import sleep
 import os
 # Global Variable
 width_square = 40
@@ -145,65 +143,6 @@ class Maze:
                         clock.tick(30)
             # pygame.display.flip()
         pygame.quit()
-
-    def build_maze(self):
-        # maze = [
-        #   [] [] []
-        # ]
-        # => maze = row and maze[] = col
-        # => xOy => maze <=> y and maze[] <=> x
-        walls = [(i, j) for i in range(len(self._maze))
-                 for j in range(len(self._maze[0])) if self._maze[i][j] == 'x']
-
-        print(self._route)
-        if self._route:
-            direction = []
-            for i in range(1, len(self._route)):
-                if self._route[i][0]-self._route[i-1][0] > 0:
-                    direction.append('v')  # ^
-                elif self._route[i][0]-self._route[i-1][0] < 0:
-                    direction.append('^')  # v
-                elif self._route[i][1]-self._route[i-1][1] > 0:
-                    direction.append('>')
-                else:
-                    direction.append('<')
-            direction.pop(0)
-        ax = plt.figure(dpi=100).add_subplot(111)
-        for i in ['top', 'bottom', 'right', 'left']:
-            ax.spines[i].set_visible(False)
-        plt.scatter(
-            [i[1] for i in walls], [-i[0] for i in walls],
-            marker='X',
-            s=100,
-            color='black'
-        )
-
-        plt.scatter(
-            [i[1] for i in self._bonus], [-i[0] for i in self._bonus],
-            marker='P',
-            s=100,
-            color='green'
-        )
-
-        plt.scatter(
-            self._startpoint[1], - (self._startpoint[0]),
-            marker='*',
-            s=100,
-            color='gold'
-        )
-        if self._route:
-            for i in range(len(self._route)-2):
-                plt.scatter(self._route[i+1][1], -self._route[i+1][0],
-                            marker=direction[i], color='silver')
-
-        plt.text(self._endpoint[1], -(self._endpoint[0]), 'EXIT', color='red',
-                 horizontalalignment='center',
-                 verticalalignment='center')
-
-        plt.xticks([])
-        plt.yticks([])
-        plt.show()
-
 
 def get_data_from_file(file_name: str):
     directory = mc.get_dir(file_name)
