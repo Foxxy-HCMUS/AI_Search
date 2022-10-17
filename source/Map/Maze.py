@@ -6,9 +6,27 @@ Maze.py có các chức năng như:
 3. In ra mê cung
 '''
 
+# Thư viện sử dụng
 import os
 import matplotlib.pyplot as plt
+from numpy import square
 import MazeCreated as mc
+import pygame
+from time import sleep
+import os
+# Global Variable
+width_square = 40
+# rgb
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+
+
+class Wall(object):
+    def __init__(self, pos):
+        self.rect = pygame.Rect(pos[0], pos[1], width_square, width_square)
 
 
 class Maze:
@@ -18,17 +36,16 @@ class Maze:
         self._startpoint = start_point
         self._endpoint = end_point
 
-    
     def bfs(self):
         start = self._startpoint
         queue = []
         visited = []  # Xác định vị trị đã đi qua
-        list_visited = []
+        self._visited = []
 
         # BFS
         queue.append(start)
         visited.append({"nextdir": start, "curdir": "start"})
-        list_visited.append(start)
+        self._visited.append(start)
 
         while queue:
             directions = []
@@ -39,10 +56,10 @@ class Maze:
             directions.append((pop_value[0]-1, pop_value[1]))  # UP
 
             for nextdir in directions:
-                if self._maze[nextdir[0]][nextdir[1]] != "x" and nextdir not in list_visited:
+                if self._maze[nextdir[0]][nextdir[1]] != "x" and nextdir not in self._visited:
                     visited.append({"nextdir": nextdir, "curdir": pop_value})
                     queue.append(nextdir)
-                    list_visited.append(nextdir)
+                    self._visited.append(nextdir)
                     if self._endpoint == nextdir:
                         print("success")
                         # Lấy vị trí cuối cùng
@@ -57,10 +74,77 @@ class Maze:
                             if (before_current == self._startpoint):
                                 self._route.append(self._startpoint)
                                 self._route.reverse()
-                                print(self._route)
                                 return
                 else:
                     pass
+
+    def run_game(self):
+        def get_display_resolution():
+            width = len(self._maze[0])*width_square + 2*len(self._maze[0])
+            height = len(self._maze)*width_square + 2*len(self._maze)
+            return (width, height)
+
+        pygame.display.set_caption("Miku")
+        screen = pygame.display.set_mode(
+            get_display_resolution(), pygame.RESIZABLE)
+
+        x = y = 0
+        walls = []
+        for row in self._maze:
+            for col in row:
+                if col == "x":
+                    walls.append(Wall((x, y)))
+                if col == "S":
+                    start_rect = pygame.Rect(x, y, 40, 40)
+                if col == "+":
+                    bonus_rect = pygame.Rect(x+10, y+10, 20, 20)
+                x += 42
+            y += 42
+            x = 0
+        end_rect = pygame.Rect(
+            self._endpoint[1]*42, self._endpoint[0]*42, 40, 40)
+
+        visited_rects = []
+        for visit in self._visited:
+            visited_rects.append(pygame.Rect(
+                visit[1]*42, visit[0]*42, 40, 40))
+
+        path_rects = []
+        for route in self._route:
+            path_rects.append(pygame.Rect(
+                route[1]*42, route[0]*42, 40, 40))
+
+        running = True
+        clock = pygame.time.Clock()
+        traversal = False
+        finish = False
+        while running:
+            # clock.tick(60)
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    running = False
+                if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+                    running = False
+            screen.fill((0, 0, 0))
+            for wall in walls:
+                pygame.draw.rect(screen, white, wall.rect)
+            pygame.draw.rect(screen, black, end_rect)
+            pygame.draw.rect(screen, red, start_rect)
+            pygame.draw.rect(screen, green, bonus_rect)
+            if not traversal:
+                pygame.display.flip()
+                for visited_rect in visited_rects:
+                    pygame.draw.rect(screen, red, visited_rect)
+                    pygame.display.flip()
+                    clock.tick(30)
+                traversal = True
+                if (not finish) and traversal:
+                    for route in path_rects:
+                        pygame.draw.rect(screen, blue, route)
+                        pygame.display.flip()
+                        clock.tick(30)
+            # pygame.display.flip()
+        pygame.quit()
 
     def build_maze(self):
         # maze = [
@@ -109,8 +193,8 @@ class Maze:
         )
         if self._route:
             for i in range(len(self._route)-2):
-                plt.scatter(self._route[i+1][1],-self._route[i+1][0],
-                            marker=direction[i],color='silver')
+                plt.scatter(self._route[i+1][1], -self._route[i+1][0],
+                            marker=direction[i], color='silver')
 
         plt.text(self._endpoint[1], -(self._endpoint[0]), 'EXIT', color='red',
                  horizontalalignment='center',
@@ -119,7 +203,6 @@ class Maze:
         plt.xticks([])
         plt.yticks([])
         plt.show()
-
 
 
 def get_data_from_file(file_name: str):
@@ -153,4 +236,4 @@ def get_data_from_file(file_name: str):
 bonus, matrix, start_point, end_point = get_data_from_file("text1.txt")
 maze = Maze(matrix, bonus, start_point, end_point)
 maze.bfs()
-maze.build_maze()
+maze.run_game()
