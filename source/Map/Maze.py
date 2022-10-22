@@ -14,13 +14,12 @@ import pygame
 import os
 # Global Variable
 width_square = 40
-# rgb
+# mã màu
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
-
 
 class Wall(object):
     def __init__(self, pos):
@@ -75,6 +74,58 @@ class Maze:
                                 return
                 else:
                     pass
+
+    def dfs(self):
+        start = self._startpoint
+        stack = []
+        visited = []  # Xác định vị trị đã đi qua
+        self._visited = []
+
+        # DFS
+        stack.append(start)
+        visited.append({"nextdir": start, "curdir": "start"})
+        self._visited.append(start)
+
+        while stack:
+            directions = []
+            pop_value = stack.pop(-1)
+            self._visited.append(pop_value)
+            directions.insert(0,(pop_value[0], pop_value[1]-1))  # LEFT
+            directions.insert(1,(pop_value[0]+1, pop_value[1]))  # DOWN
+            directions.insert(2,(pop_value[0], pop_value[1]+1))  # RIGHT
+            directions.insert(3,(pop_value[0]-1, pop_value[1]))  # UP
+
+            count=0
+            for nextdir in directions:
+                if self._maze[nextdir[0]][nextdir[1]] != "x" and nextdir not in self._visited:
+                    visited.append({"nextdir": nextdir, "curdir": pop_value})
+                    stack.insert(len(stack)-count, nextdir)
+                    count+=1
+                    if self._endpoint == nextdir:
+                        print("success")
+                        # Lấy vị trí cuối cùng
+                        self._route = []
+                        self._route.append(self._endpoint)
+                        self._visited.append(self._endpoint)
+                        before_current = visited[len(visited)-1]["curdir"]
+                        while (True):
+                            self._route.append(before_current)
+                            before_current = [
+                                i["curdir"] for i in visited if i["nextdir"] == before_current]
+                            before_current = before_current[0]
+                            if (before_current == self._startpoint):
+                                self._route.append(self._startpoint)
+                                self._route.reverse()
+                                return
+                else:
+                    pass
+
+    def ucs(self):
+        start = self._startpoint
+        visited = []  # Xác định vị trị đã đi qua
+        self._visited = []
+
+
 
     def run_game(self):
         def get_display_resolution():
@@ -134,7 +185,7 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(30)
+                    clock.tick(60)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
@@ -143,6 +194,7 @@ class Maze:
                         clock.tick(30)
             # pygame.display.flip()
         pygame.quit()
+
 
 def get_data_from_file(file_name: str):
     directory = mc.get_dir(file_name)
