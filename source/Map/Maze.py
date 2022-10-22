@@ -42,11 +42,11 @@ class Maze:
         # BFS
         queue.append(start)
         visited.append({"nextdir": start, "curdir": "start"})
-        self._visited.append(start)
 
         while queue:
             directions = []
             pop_value = queue.pop(0)
+            self._visited.append(pop_value)
             directions.append((pop_value[0], pop_value[1]-1))  # LEFT
             directions.append((pop_value[0]+1, pop_value[1]))  # DOWN
             directions.append((pop_value[0], pop_value[1]+1))  # RIGHT
@@ -56,12 +56,13 @@ class Maze:
                 if self._maze[nextdir[0]][nextdir[1]] != "x" and nextdir not in self._visited:
                     visited.append({"nextdir": nextdir, "curdir": pop_value})
                     queue.append(nextdir)
-                    self._visited.append(nextdir)
+                    #self._visited.append(nextdir)
                     if self._endpoint == nextdir:
                         print("success")
                         # Lấy vị trí cuối cùng
                         self._route = []
                         self._route.append(self._endpoint)
+                        self._visited.append(self._endpoint)
                         before_current = visited[len(visited)-1]["curdir"]
                         while (True):
                             self._route.append(before_current)
@@ -124,7 +125,10 @@ class Maze:
         start = self._startpoint
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
+        queue = []
 
+        queue.append(start)
+        visited.append({"nextdir": start, "curdir": "start"})
 
 
     def run_game(self):
@@ -191,7 +195,7 @@ class Maze:
                     for route in path_rects:
                         pygame.draw.rect(screen, blue, route)
                         pygame.display.flip()
-                        clock.tick(30)
+                        clock.tick(60)
             # pygame.display.flip()
         pygame.quit()
 
