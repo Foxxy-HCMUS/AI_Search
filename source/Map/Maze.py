@@ -8,6 +8,8 @@ Maze.py có các chức năng như:
 
 # Thư viện sử dụng
 # import matplotlib.pyplot as plt
+from math import floor, sqrt
+from queue import PriorityQueue
 from numpy import square
 import MazeCreated as mc
 import pygame
@@ -22,6 +24,8 @@ red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 
+rowNum = [-1, 0, 0, 1]
+colNum = [0, -1, 1, 0]
 
 class Wall(object):
     def __init__(self, pos):
@@ -184,6 +188,52 @@ class Maze:
                                 return
                 else:
                     pass
+                
+    def isValid(self, row: int, col: int):
+        return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '  
+        
+    def heuristics(self, point, name: str):
+        if name == "Manhanttan": # Khoảng cách Manhanttan
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return 1*(dx+dy) # chọn D = 1 là chi phí tối thiểu để di chuyển sang một ô liền kề
+        elif name == "Euclidean":
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return floor(1* sqrt(dx * dx + dy * dy))
+    
+    def gbfs(self):
+        
+        pQ = PriorityQueue()
+        self._visited = {}
+        self._route = []
+        #self._visited[self._startpoint] = (self._startpoint)
+        self._visited[(0,self._startpoint)] = (0,self._startpoint)
+        pQ.put((0,self._startpoint))
+        while not pQ.empty():
+            curr = pQ.get()[1]
+            self._route.append(curr)
+            
+            if curr == self._endpoint:
+                break
+            
+            #pQ = PriorityQueue()
+            for i in range(4):
+                row = curr[0] + rowNum[i]
+                col = curr[1] + colNum[i]
+
+                point = self.heuristics((row,col),"Euclidean"),(row,col)
+                #point = self.heuristics((row,col),"Euclidean"),(row,col)
+                if (self.isValid(row,col) and point not in self._visited):
+                    self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Euclidean"),(curr[0],curr[1]))   
+                    # Adjcell = queueNode(Point(row,col),
+                    #                 curr.dist+1)
+                    pQ.put(point)
+  
+        [(8, 15), (8, 14), (7, 14), (6, 14), (6, 13), (6, 12), (6, 11), (6, 10), (6, 9), (5, 9), (5, 8), (5, 7), (5, 6), (5, 5), (5, 4), (5, 3), (5, 2), (5, 1), (4, 1), (4, 0)]
+        [(8, 15), (7, 15), (7, 14), (6, 14), (6, 13), (5, 13), (4, 13), (4, 12), (4, 14), (6, 12), (6, 11), (6, 10), (5, 10), (5, 9), (4, 9), (5, 8), (5, 7), 
+(4, 7), (5, 6), (5, 5), (4, 5), (4, 4), (4, 3), (3, 3), (5, 3), (5, 2), (5, 1), (4, 1), (4, 0)]
+        print(self._visited)
 
     def run_game(self):
         def get_display_resolution():
@@ -214,7 +264,7 @@ class Maze:
         visited_rects = []
         for visit in self._visited:
             visited_rects.append(pygame.Rect(
-                visit[1]*42, visit[0]*42, 40, 40))
+                visit[1][1]*42, visit[1][0]*42, 40, 40))  # here
 
         path_rects = []
         for route in self._route:
@@ -284,5 +334,5 @@ def get_data_from_file(file_name: str):
 # main
 bonus, matrix, start_point, end_point = get_data_from_file("text1.txt")
 maze = Maze(matrix, bonus, start_point, end_point)
-maze.ucs()
+maze.gbfs()
 maze.run_game()
