@@ -223,16 +223,10 @@ class Maze:
                 col = curr[1] + colNum[i]
 
                 point = self.heuristics((row,col),"Euclidean"),(row,col)
-                #point = self.heuristics((row,col),"Euclidean"),(row,col)
                 if (self.isValid(row,col) and point not in self._visited):
                     self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Euclidean"),(curr[0],curr[1]))   
-                    # Adjcell = queueNode(Point(row,col),
-                    #                 curr.dist+1)
                     pQ.put(point)
   
-        [(8, 15), (8, 14), (7, 14), (6, 14), (6, 13), (6, 12), (6, 11), (6, 10), (6, 9), (5, 9), (5, 8), (5, 7), (5, 6), (5, 5), (5, 4), (5, 3), (5, 2), (5, 1), (4, 1), (4, 0)]
-        [(8, 15), (7, 15), (7, 14), (6, 14), (6, 13), (5, 13), (4, 13), (4, 12), (4, 14), (6, 12), (6, 11), (6, 10), (5, 10), (5, 9), (4, 9), (5, 8), (5, 7), 
-(4, 7), (5, 6), (5, 5), (4, 5), (4, 4), (4, 3), (3, 3), (5, 3), (5, 2), (5, 1), (4, 1), (4, 0)]
         print(self._visited)
 
     def run_game(self):
