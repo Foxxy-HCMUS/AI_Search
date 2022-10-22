@@ -16,7 +16,7 @@ def get_directory_file(filename):
 with open(get_directory_file("text1.txt"), 'w') as outfile:
   outfile.write('2\n')
   outfile.write('3 6 -3\n')
-  outfile.write('5 14 -1\n')
+  outfile.write('5 14 -20\n')
   outfile.write('xxxxxxxxxxxxxxxxxxxxxx\n')
   outfile.write('x   x   xx xx        x\n')
   outfile.write('x     x     xxxxxxxxxx\n')
