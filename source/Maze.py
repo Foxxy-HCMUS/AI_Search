@@ -404,10 +404,12 @@ class Maze:
                             self._route[route+1][1]*42+10, self._route[route+1][0]*42+10), 5)
                         pygame.display.update()
                 try:
-                    os.makedirs(f"output/{name[0]}/{name[1]}/{self._name}")
+                    os.makedirs(f"output/{name[0]}/{name[1][:-4]}/{self._name}")
                 except:
                     pass
-                pygame.image.save(screen, f"output/{name[0]}/{name[1]}/{self._name}/" + f"{self._name}.jpg")
+                pygame.image.save(screen, f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.jpg")
+                with open (f"output/{name[0]}/{name[1][:-4]}/{self._name}/"+ f"{self._name}.txt", "w") as fwrite:
+                    fwrite.write(str(len(self._route)))
                 break
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
