@@ -318,7 +318,7 @@ class Maze:
                     pQ.put(new_cost,(row,col))  
         
 
-    def run_game(self):
+    def run_game(self, name):
         def get_display_resolution():
             width = len(self._maze[0])*width_square + 2*len(self._maze[0])
             height = len(self._maze)*width_square + 2*len(self._maze)
@@ -401,8 +401,7 @@ class Maze:
                         clock.tick(60)
                 screen.blit(
                     img1, (self._endpoint[1]*42+10, self._endpoint[0]*42+10))
-                namefile = name.split('/')
-                pygame.image.save(screen, "output/" + self._name+ "/" + namefile[-1] + "/" + f"{self._name}_{namefile[-1]}" + ".jpg")
+                pygame.image.save(screen, "output/" + self._name+ "/" + name + "/" + f"{self._name}_{name}" + ".jpg")
                 break
         pygame.quit()
 
