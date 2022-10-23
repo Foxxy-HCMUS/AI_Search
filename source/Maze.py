@@ -329,7 +329,7 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(30)
+                    clock.tick(10)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
