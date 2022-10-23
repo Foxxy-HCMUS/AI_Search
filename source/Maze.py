@@ -15,6 +15,7 @@ from numpy import square
 import MazeCreated as mc
 import pygame
 import os
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 from operator import itemgetter
 #import pyautogui
 # Global Variable
@@ -259,6 +260,13 @@ class Maze:
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
             return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        elif name == "Tie-breaking": # tích chéo giữa vector bắt đầu đến điểm đến và vector điểm hiện tại đến điểm đến
+            dx1 = point[0] - self._endpoint[0]
+            dy1 = point[1] - self._endpoint[1]
+            dx2 = self._startpoint[0] - self._endpoint[0]
+            dy2 = self._startpoint[1] - self._endpoint[1]
+            cross = abs(dx1*dy2 - dx2*dy1)
+            return cross*0.001
 
     def backward(self):
         route = []
@@ -430,18 +438,18 @@ class Maze:
                         pygame.display.update()
                 try:
                     os.makedirs(
-                        f"output/{name[0]}/{name[1][:-4]}/{self._name}")
+                        f"../output/{name[0]}/{name[1][:-4]}/{self._name}")
                 except:
                     pass
                 if self._name == "astar" or self._name == "gbfs":
                     pygame.image.save(
-                        screen, f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}_heuristic_{count}.jpg")
-                    with open(f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}_heuristic_{count}.txt", "w") as fwrite:
+                        screen, f"../output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}_heuristic_{count}.jpg")
+                    with open(f"../output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}_heuristic_{count}.txt", "w") as fwrite:
                         fwrite.write(str(len(self._route)))
                 else:
                     pygame.image.save(
-                        screen, f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.jpg")
-                    with open(f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.txt", "w") as fwrite:
+                        screen, f"../output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.jpg")
+                    with open(f"../output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.txt", "w") as fwrite:
                         if len(self._route) != 0:
                             fwrite.write(str(len(self._route)))
                         else:

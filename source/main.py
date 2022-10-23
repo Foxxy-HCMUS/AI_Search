@@ -3,7 +3,7 @@ import MazeCreated as MC
 import os
 import time
 def count_map_in(level):
-    path, dirs, files = next(os.walk(f"input/{level}"))
+    path, dirs, files = next(os.walk(f"../input/{level}"))
     file_count = len(files)
 
     return file_count

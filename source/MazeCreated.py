@@ -3,7 +3,7 @@ import os
 
 def get_dir(filename):
     fileDir = os.path.dirname(os.path.realpath('__file__'))
-    directory = os.path.join(fileDir, f'input/{filename}')
+    directory = os.path.join(fileDir, f'../input/{filename}')
     return directory
 
 
@@ -18,16 +18,16 @@ def get_directory_file(filename):
 
 def output(filename):
     try:
-        os.mkdir("output")
+        os.mkdir("../output")
     except:
         pass
-    os.makedirs("output/" + f"{filename}")
+    os.makedirs("../output/" + f"{filename}")
 
 
 # main
 def create_Map_Lv1():
     try:
-        os.makedirs("input/level_1")
+        os.makedirs("../input/level_1")
     except:
         pass
     path = "level_1/"
