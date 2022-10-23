@@ -25,7 +25,7 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
-yellow = (255,255,0)
+yellow = (255, 255, 0)
 
 rowNum = [-1, 0, 0, 1]
 colNum = [0, -1, 1, 0]
@@ -49,6 +49,7 @@ class Maze:
         queue = []
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
+        self._route = []
         go = []
 
         # BFS
@@ -57,7 +58,11 @@ class Maze:
         while queue:
             directions = []
             while (True):
-                pop_value = queue.pop(0)
+                try:
+                    pop_value = queue.pop(0)
+                except:
+                    print("Khong co duong ra")
+                    return
                 if pop_value["nextdir"] not in self._visited:
                     self._visited.append(pop_value["nextdir"])
                     go.append(
@@ -85,7 +90,6 @@ class Maze:
                     if self._endpoint == nextdir:
                         print("success")
                         # Lấy vị trí cuối cùng
-                        self._route = []
                         self._route.append(self._endpoint)
                         self._visited.append(self._endpoint)
                         before_current = go[len(go)-1]["nextdir"]
@@ -107,6 +111,7 @@ class Maze:
         stack = []
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
+        self._route =[]
 
         # DFS
         stack.append({"nextdir": start, "curdir": start})
@@ -115,7 +120,11 @@ class Maze:
         while stack:
             directions = []
             while (True):
-                pop_value = stack.pop(-1)
+                try: 
+                    pop_value = stack.pop(-1)
+                except:
+                    print("Khong co duong ra")
+                    return
                 if pop_value["nextdir"] not in self._visited:
                     self._visited.append(pop_value["nextdir"])
                     go.append(
@@ -143,7 +152,6 @@ class Maze:
                     if self._endpoint == nextdir:
                         print("success")
                         # Lấy vị trí cuối cùng
-                        self._route = []
                         self._route.append(self._endpoint)
                         self._visited.append(self._endpoint)
                         before_current = go[len(go)-1]["nextdir"]
@@ -165,6 +173,7 @@ class Maze:
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
         queue = []
+        self._route = []
         bonusdir = [i["dir"] for i in self._bonus]
         bonusreward = [i["reward"] for i in self._bonus]
         queue.append({"nextdir": start, "curdir": start, "cost": 0}),
@@ -172,9 +181,14 @@ class Maze:
         go = []
         while (True):
             directions = []
-            queue = sorted(queue, key=itemgetter('cost'))
+            
             while (True):
-                pop_value = queue.pop(0)
+                try:
+                    queue = sorted(queue, key=itemgetter('cost'))
+                    pop_value = queue.pop(0)
+                except:
+                    print("Khong duong ra")
+                    return
                 if pop_value["nextdir"] not in self._visited:
                     self._visited.append(pop_value["nextdir"])
                     go.append(
@@ -207,7 +221,6 @@ class Maze:
                     if self._endpoint == nextdir:
                         print("success")
                         # Lấy vị trí cuối cùng
-                        self._route = []
                         self._route.append(self._endpoint)
                         self._visited.append(self._endpoint)
                         before_current = go[len(go)-1]["nextdir"]
@@ -258,7 +271,7 @@ class Maze:
         route.reverse()
         return route
 
-    def gbfs(self):
+    def gbfs(self, nameheur):
         self._name = "gbfs"
 
         pQ = PriorityQueue()
@@ -268,7 +281,11 @@ class Maze:
         self._visited[(self._startpoint)] = (self._startpoint)
         pQ.put((0, self._startpoint))
         while not pQ.empty():
-            curr = pQ.get()[1]
+            try:
+                curr = pQ.get()[1]
+            except:
+                print("Khong co duong ra")
+                return
             # self._route.append(curr)
 
             if curr == self._endpoint:
@@ -282,13 +299,13 @@ class Maze:
                 point = (row, col)
                 if (self.isValid(row, col) and point not in self._visited):
                     #self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))
-                    priority = self.heuristics((row, col), "Manhanttan")
+                    priority = self.heuristics((row, col), nameheur)
                     self._visited[point] = (curr[0], curr[1])
                     pQ.put((priority, point))
         self._route = self.backward()
         # print(self._route)
 
-    def astar(self):
+    def astar(self, nameheur):
         self._name = "astar"
         pQ = PriorityQueue()
         pQ.put((0, self._startpoint))
@@ -306,7 +323,11 @@ class Maze:
         #self._visited[(self._startpoint)] = self._startpoint
 
         while not pQ.empty():
-            curr = pQ.get()[1]
+            try:
+                curr = pQ.get()[1]
+            except:
+                print("Khong co duong ra")
+                return 
 
             closed.append(curr)
             a = curr[0]
@@ -320,17 +341,20 @@ class Maze:
                 cost = cost_so_far[curr] + 1
                 if self.isValid(row, col) and ((row, col) not in cost_so_far or cost < cost_so_far[row, col]):
                     cost_so_far[(row, col)] = cost
-                    priority = cost + self.heuristics((row, col), "Manhanttan")
+                    priority = cost + \
+                        self.heuristics((row, col), nameheur)
                     pQ.put((priority, (row, col)))
                     self._visited[(row, col)] = (curr[0], curr[1])
         self._route = self.backward()
 
-    def run_game(self, name):
+    def run_game(self, name, count=0):
         def get_display_resolution():
             width = len(self._maze[0])*width_square + 2*len(self._maze[0])
             height = len(self._maze)*width_square + 2*len(self._maze)
             return (width, height)
 
+        print("name: " + str(self._name))
+        print("cost : " + str(len(self._visited)))
         pygame.display.set_caption("Miku")
         screen = pygame.display.set_mode(
             get_display_resolution(), pygame.RESIZABLE)
@@ -361,9 +385,10 @@ class Maze:
                 visit[1]*42, visit[0]*42, 40, 40))  # here  # here
 
         path_rects = []
-        for route in self._route:
-            path_rects.append(pygame.Rect(
-                route[1]*42, route[0]*42, 40, 40))
+        if len(self._route) != 0:
+            for route in self._route:
+                path_rects.append(pygame.Rect(
+                    route[1]*42, route[0]*42, 40, 40))
 
         running = True
         clock = pygame.time.Clock()
@@ -390,7 +415,7 @@ class Maze:
                 for visited_rect in visited_rects[1:]:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(50)
+                    clock.tick(60)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects[1:]:
@@ -404,12 +429,23 @@ class Maze:
                             self._route[route+1][1]*42+10, self._route[route+1][0]*42+10), 5)
                         pygame.display.update()
                 try:
-                    os.makedirs(f"output/{name[0]}/{name[1][:-4]}/{self._name}")
+                    os.makedirs(
+                        f"output/{name[0]}/{name[1][:-4]}/{self._name}")
                 except:
                     pass
-                pygame.image.save(screen, f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.jpg")
-                with open (f"output/{name[0]}/{name[1][:-4]}/{self._name}/"+ f"{self._name}.txt", "w") as fwrite:
-                    fwrite.write(str(len(self._route)))
+                if self._name == "astar" or self._name == "gbfs":
+                    pygame.image.save(
+                        screen, f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}_heuristic_{count}.jpg")
+                    with open(f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}_heuristic_{count}.txt", "w") as fwrite:
+                        fwrite.write(str(len(self._route)))
+                else:
+                    pygame.image.save(
+                        screen, f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.jpg")
+                    with open(f"output/{name[0]}/{name[1][:-4]}/{self._name}/" + f"{self._name}.txt", "w") as fwrite:
+                        if len(self._route) != 0:
+                            fwrite.write(str(len(self._route)))
+                        else:
+                            fwrite.write("NO")
                 break
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()

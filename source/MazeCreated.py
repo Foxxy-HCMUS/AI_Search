@@ -2,7 +2,6 @@ import os
 
 
 def get_dir(filename):
-    print(filename)
     fileDir = os.path.dirname(os.path.realpath('__file__'))
     directory = os.path.join(fileDir, f'input/{filename}')
     return directory
@@ -121,3 +120,21 @@ def create_Map_Lv1():
         outfile.write('xxxxx xxxxx x  xxxxxxxxxxxxx   xxxx\n')
         outfile.write('x     x            x              x\n')
         outfile.write('x xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')
+
+    with open(get_directory_file(path + "input6.txt"), 'w') as outfile:
+        outfile.write('0\n')
+        outfile.write('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')
+        outfile.write('x                            xxxxx\n')
+        outfile.write('x                            xxxxx\n')
+        outfile.write('x                                 \n')
+        outfile.write('x     xxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')
+        outfile.write('x                           xxxxxx\n')
+        outfile.write('x                           xxxxxx\n')
+        outfile.write('x                           xxxxxx\n')
+        outfile.write('x                           xxxxxx\n')
+        outfile.write('x                           xxxxxx\n')
+        outfile.write('x                           xxxxxx\n')
+        outfile.write('x                           xxxxxx\n')
+        outfile.write('x         xxxxxxxxxxxxxxxxxxxxxxxx\n')
+        outfile.write('x S                              x\n')
+        outfile.write('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')
