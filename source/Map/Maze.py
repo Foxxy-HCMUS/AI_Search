@@ -240,6 +240,18 @@ class Maze:
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
             return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+    
+    def backward(self):
+        route = []
+        curr = self._endpoint
+        self._route = []
+        while curr != self._startpoint:
+            route.append(curr)
+            curr = self._visited[curr]
+        route.append(self._startpoint)
+        route.reverse()
+        return route
+    
     def gbfs(self):
         
         pQ = PriorityQueue()
@@ -333,14 +345,9 @@ class Maze:
             self._endpoint[1]*42, self._endpoint[0]*42, 40, 40)
 
         visited_rects = []
-        if (isinstance(self._visited, list)):
-            for visit in self._visited:
-                visited_rects.append(pygame.Rect(
-                    visit[1]*42, visit[0]*42, 40, 40))  # here
-        else:
-            for visit in self._visited:
-                visited_rects.append(pygame.Rect(
-                    visit.key()[1]*42, visit.key()[0]*42, 40, 40))  # here
+        for visit in self._visited:
+            visited_rects.append(pygame.Rect(
+                visit[1]*42, visit[0]*42, 40, 40))  # here
 
         path_rects = []
         for route in self._route:
@@ -369,7 +376,7 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(50)
+                    clock.tick(10)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
@@ -384,7 +391,7 @@ class Maze:
         pygame.quit()
 
 
-def get_data_from_file(file_name):
+def get_data_from_file(file_name: str):
     directory = mc.get_dir(file_name)
     with open(directory, 'r') as f:
         n_bonus_points = int(next(f)[:-1])
@@ -410,3 +417,9 @@ def get_data_from_file(file_name):
         start_point, end_point = find_start_end()
     return bonus_points, matrix, start_point, end_point
 
+
+# main
+# bonus, matrix, start_point, end_point = get_data_from_file("text1.txt")
+# maze = Maze(matrix, bonus, start_point, end_point)
+# maze.astar()
+# maze.run_game()
