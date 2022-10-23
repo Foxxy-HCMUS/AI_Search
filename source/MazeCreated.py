@@ -1,7 +1,7 @@
 import os
 def get_dir(filename):
     fileDir = os.path.dirname(os.path.realpath('__file__'))
-    directory = os.path.join(fileDir, 'input/txt/{0}'.format(filename))
+    directory = os.path.join(fileDir, 'input/{0}'.format(filename))
     return directory
 
 def get_directory_file(filename):
@@ -13,18 +13,18 @@ def get_directory_file(filename):
     return directory
 
 #main
-with open(get_directory_file("text1.txt"), 'w') as outfile:
-  outfile.write('2\n')
-  outfile.write('3 6 -3\n')
-  outfile.write('5 14 -20\n')
-  outfile.write('xxxxxxxxxxxxxxxxxxxxxx\n')
-  outfile.write('x   x   xx xx        x\n')
-  outfile.write('x     x     xxxxxxxxxx\n')
-  outfile.write('x x   +xx  xxxx xxx xx\n')
-  outfile.write('  x   x x xx   xxxx  x\n')
-  outfile.write('x          xx +xx  x x\n')
-  outfile.write('xxxxxxx x      xx  x x\n')
-  outfile.write('xxxxxxxxx  x x  xx   x\n')
-  outfile.write('x          x x Sx x  x\n')
-  outfile.write('xxxxx x  x x x     x x\n')
-  outfile.write('xxxxxxxxxxxxxxxxxxxxxx')
+def create_Map(name):
+    with open(get_directory_file( name), 'w') as outfile:
+        outfile.write('0\n')
+        outfile.write('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')
+        outfile.write('x    S                            x\n')
+        outfile.write('x                  xxxxxxxxxxxxxxxx\n')
+        outfile.write('xxxxxxxxxxxx                      x\n')
+        outfile.write('x                  x              x\n')
+        outfile.write('xxxxxxxxxxxxxxxxxxxxxxxxxxxx      x\n')
+        outfile.write('                                  x\n')
+        outfile.write('xxxxxxxxxxx        xxxxxx         x\n')
+        outfile.write('x         x             x         x\n')
+        outfile.write('x                       xx        x\n')
+        outfile.write('x         x      xxxxxxxx         x\n')
+        outfile.write('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')

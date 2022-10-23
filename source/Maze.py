@@ -273,6 +273,7 @@ class Maze:
 
         x = y = 0
         walls = []
+        bonus_rect = []
         for row in self._maze:
             for col in row:
                 if col == "x":
@@ -280,7 +281,7 @@ class Maze:
                 if col == "S":
                     start_rect = pygame.Rect(x, y, 40, 40)
                 if col == "+":
-                    bonus_rect = pygame.Rect(x+10, y+10, 20, 20)
+                    bonus_rect.append(pygame.Rect(x+10, y+10, 20, 20))
                 x += 42
             y += 42
             x = 0
@@ -318,7 +319,9 @@ class Maze:
                 pygame.draw.rect(screen, white, wall.rect)
             pygame.draw.rect(screen, black, end_rect)
             pygame.draw.rect(screen, red, start_rect)
-            pygame.draw.rect(screen, green, bonus_rect)
+            if bonus_rect != None:
+                for bonus in bonus_rect:
+                    pygame.draw.rect(screen, green, bonus)
             screen.blit(
                 img1, (self._endpoint[1]*42+10, self._endpoint[0]*42+10))
             if not traversal:
@@ -337,7 +340,7 @@ class Maze:
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
         # myScreenshot.save("output/hinhanh.png")
-        pygame.image.save(screen, "output/" + name + ".png")
+        pygame.image.save(screen, "output/" + name + ".jpg")
         pygame.quit()
 
 
@@ -345,8 +348,8 @@ def get_data_from_file(file_name: str):
     directory = mc.get_dir(file_name)
     with open(directory, 'r') as f:
         n_bonus_points = int(next(f)[:-1])
+        bonus_points = []
         if n_bonus_points != 0:
-            bonus_points = []
             for i in range(n_bonus_points):
                 x, y, reward = map(int, next(f)[:-1].split(' '))
                 bonus_points.append({"dir": (x, y), "reward": reward})

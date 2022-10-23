@@ -1,6 +1,4 @@
 0
-3 6 -3
-5 14 -20
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 x    S                            x
 x                  xxxxxxxxxxxxxxxx
