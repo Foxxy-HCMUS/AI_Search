@@ -419,7 +419,7 @@ def get_data_from_file(file_name: str):
 
 
 # main
-bonus, matrix, start_point, end_point = get_data_from_file("./input/text1.txt")
-maze = Maze(matrix, bonus, start_point, end_point)
-maze.astar()
-maze.run_game()
+# bonus, matrix, start_point, end_point = get_data_from_file("./input/text1.txt")
+# maze = Maze(matrix, bonus, start_point, end_point)
+# maze.astar()
+# maze.run_game()
