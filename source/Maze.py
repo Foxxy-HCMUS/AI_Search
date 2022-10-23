@@ -25,6 +25,7 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
+yellow = (255,255,0)
 
 rowNum = [-1, 0, 0, 1]
 colNum = [0, -1, 1, 0]
@@ -379,20 +380,20 @@ class Maze:
             for wall in walls:
                 pygame.draw.rect(screen, white, wall.rect)
             pygame.draw.rect(screen, black, end_rect)
-            pygame.draw.rect(screen, red, start_rect)
+            pygame.draw.rect(screen, yellow, start_rect)
             if bonus_rect != None:
                 for bonus in bonus_rect:
                     pygame.draw.rect(screen, green, bonus)
             screen.blit(text, (self._endpoint[1]*42+5, self._endpoint[0]*42+5))
             if not traversal:
                 pygame.display.flip()
-                for visited_rect in visited_rects:
+                for visited_rect in visited_rects[1:]:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
                     clock.tick(50)
                 traversal = True
                 if (not finish) and traversal:
-                    for route in path_rects:
+                    for route in path_rects[1:]:
                         pygame.draw.rect(screen, blue, route)
                         pygame.display.flip()
                         clock.tick(60)
@@ -402,8 +403,11 @@ class Maze:
                         pygame.draw.line(screen, black, (self._route[route][1]*42+10, self._route[route][0]*42+10), (
                             self._route[route+1][1]*42+10, self._route[route+1][0]*42+10), 5)
                         pygame.display.update()
-                pygame.image.save(screen, "output/" + self._name +
-                                  "/" + name[0] + "/" + f"{self._name}_{name[0]}_{name[1]}.jpg")
+                try:
+                    os.makedirs(f"output/{name[0]}/{name[1]}/{self._name}")
+                except:
+                    pass
+                pygame.image.save(screen, f"output/{name[0]}/{name[1]}/{self._name}/" + f"{self._name}.jpg")
                 break
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
