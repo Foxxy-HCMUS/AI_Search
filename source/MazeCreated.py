@@ -31,7 +31,7 @@ def create_Map_Lv1():
     with open(get_directory_file(path + "text1.txt"), 'w') as outfile:
         outfile.write('0\n')
         outfile.write('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')
-        outfile.write('x    S                            x\n')
+        outfile.write('x    S                 +          x\n')
         outfile.write('x                  xxxxxxxxxxxxxxxx\n')
         outfile.write('xxxxxxxxxxxx                      x\n')
         outfile.write('x                  x              x\n')

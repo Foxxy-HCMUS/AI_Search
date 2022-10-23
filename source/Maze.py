@@ -275,7 +275,7 @@ class Maze:
                 point = (row,col)
                 if (self.isValid(row,col) and point not in self._visited):
                     #self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))  
-                    priority = self.heuristics((row,col),"Manhanttan") 
+                    priority = self.heuristics((row,col),"Octile") 
                     self._visited[point] = (curr[0],curr[1])
                     pQ.put((priority,point))
         self._route = self.backward()
