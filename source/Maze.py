@@ -240,7 +240,20 @@ class Maze:
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
             return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+
+    def backward(self):
+        route = []
+        curr = self._endpoint
+        self._route = []
+        while curr != self._startpoint:
+            route.append(curr)
+            curr = self._visited[curr]
+        route.append(self._startpoint)
+        route.reverse()
+        return route
+
     def gbfs(self):
+        self._name = "gbfs"
         
         pQ = PriorityQueue()
         self._visited = {}
@@ -306,7 +319,7 @@ class Maze:
         self._route = self.backward()
         
 
-    def run_game(self):
+    def run_game(self, name):
         def get_display_resolution():
             width = len(self._maze[0])*width_square + 2*len(self._maze[0])
             height = len(self._maze)*width_square + 2*len(self._maze)
@@ -316,8 +329,12 @@ class Maze:
         screen = pygame.display.set_mode(
             get_display_resolution(), pygame.RESIZABLE)
 
+        pygame.init()
+        font = pygame.font.SysFont('timesnewroman', 32)
+        text = font.render('Exit', True, green)
         x = y = 0
         walls = []
+        bonus_rect =[]
         for row in self._maze:
             for col in row:
                 if col == "x":
@@ -325,7 +342,7 @@ class Maze:
                 if col == "S":
                     start_rect = pygame.Rect(x, y, 40, 40)
                 if col == "+":
-                    bonus_rect = pygame.Rect(x+10, y+10, 20, 20)
+                    bonus_rect.append(pygame.Rect(x+10, y+10, 20, 20))
                 x += 42
             y += 42
             x = 0
@@ -333,14 +350,9 @@ class Maze:
             self._endpoint[1]*42, self._endpoint[0]*42, 40, 40)
 
         visited_rects = []
-        if (isinstance(self._visited, list)):
-            for visit in self._visited:
-                visited_rects.append(pygame.Rect(
-                    visit[1]*42, visit[0]*42, 40, 40))  # here
-        else:
-            for visit in self._visited:
-                visited_rects.append(pygame.Rect(
-                    visit.key()[1]*42, visit.key()[0]*42, 40, 40))  # here
+        for visit in self._visited:
+            visited_rects.append(pygame.Rect(
+                visit[1]*42, visit[0]*42, 40, 40))  # here  # here
 
         path_rects = []
         for route in self._route:
@@ -363,7 +375,10 @@ class Maze:
                 pygame.draw.rect(screen, white, wall.rect)
             pygame.draw.rect(screen, black, end_rect)
             pygame.draw.rect(screen, red, start_rect)
-            pygame.draw.rect(screen, green, bonus_rect)
+            if bonus_rect !=None:
+                for bonus in bonus_rect:
+                    pygame.draw.rect(screen, green, bonus)
+            screen.blit(text,(self._endpoint[1]*42+5, self._endpoint[0]*42+5))
             if not traversal:
                 pygame.display.flip()
                 for visited_rect in visited_rects:
@@ -376,10 +391,15 @@ class Maze:
                         pygame.draw.rect(screen, blue, route)
                         pygame.display.flip()
                         clock.tick(60)
-                pygame.image.save(screen, "output/hinhanh.png")
+                    screen.blit(text,(self._endpoint[1]*42+5, self._endpoint[0]*42+5))
+                    for route in range(len(self._route)-1):
+                        pygame.draw.line(screen, black, (self._route[route][1]*42+10,self._route[route][0]*42+10),(self._route[route+1][1]*42+10,self._route[route+1][0]*42+10) , 5)
+                        pygame.display.update()
+                pygame.image.save(screen, "output/" + self._name + "/" + f"{self._name}_{name}.jpg")
+                break
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
-        # myScreenshot.save("output/hinhanh.png")
+        # myScreenshot.save("output/" + self._name + f"{self._name}_{name}.jpg")
 
         pygame.quit()
 
@@ -389,9 +409,10 @@ def get_data_from_file(file_name):
     with open(directory, 'r') as f:
         n_bonus_points = int(next(f)[:-1])
         bonus_points = []
-        for i in range(n_bonus_points):
-            x, y, reward = map(int, next(f)[:-1].split(' '))
-            bonus_points.append({"dir": (x, y), "reward": reward})
+        if n_bonus_points != 0:
+            for i in range(n_bonus_points):
+                x, y, reward = map(int, next(f)[:-1].split(' '))
+                bonus_points.append({"dir": (x, y), "reward": reward})
         text = f.read()
         matrix = [list(i) for i in text.splitlines()]
 
