@@ -15,7 +15,7 @@ import MazeCreated as mc
 import pygame
 import os
 from operator import itemgetter
-# import pyautogui
+#import pyautogui
 # Global Variable
 width_square = 40
 # mã màu
@@ -24,11 +24,9 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
-yellow = (255, 255, 0)
 
 rowNum = [-1, 0, 0, 1]
 colNum = [0, -1, 1, 0]
-
 
 class Wall(object):
     def __init__(self, pos):
@@ -43,7 +41,6 @@ class Maze:
         self._endpoint = end_point
 
     def bfs(self):
-        self._name = "bfs"
         start = self._startpoint
         queue = []
         visited = []  # Xác định vị trị đã đi qua
@@ -101,7 +98,6 @@ class Maze:
                     pass
 
     def dfs(self):
-        self._name = "dfs"
         start = self._startpoint
         stack = []
         visited = []  # Xác định vị trị đã đi qua
@@ -159,7 +155,6 @@ class Maze:
                     pass
 
     def ucs(self):
-        self._name = "ucs"
         start = self._startpoint
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
@@ -221,23 +216,32 @@ class Maze:
                                 return
                 else:
                     pass
-
+                
     def isValid(self, row: int, col: int):
-        return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '
-
-    def heuristics(self, point, name: str):
-        if name == "Manhanttan":  # Khoảng cách Manhanttan
+        return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '  
+        
+    def heuristics(self, point, name: str) -> float:
+        if name == "Manhanttan": # Khoảng cách Manhanttan
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
-            # chọn D = 1 là chi phí tối thiểu để di chuyển sang một ô liền kề
-            return 1*(dx+dy)
+            return 1*(dx+dy) # chọn D = 1 là chi phí tối thiểu để di chuyển sang một ô liền kề
         elif name == "Euclidean":
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
-            return floor(1 * sqrt(dx * dx + dy * dy))
-
+            return floor(1* sqrt(dx * dx + dy * dy))
+        elif name == "Chebyshev":
+            D, D2 = 1, 1  # D2 = 1 -> Chebyshev , D2 = sqrt(2) -> Octile
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        elif name == "Octile":
+            D, D2 = 1, sqrt(2)  # D2 = 1 -> Chebyshev , D2 = sqrt(2) -> Octile
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+    
     def gbfs(self):
-
+        
         pQ = PriorityQueue()
         self._visited = {}
         self._route = []
@@ -250,7 +254,7 @@ class Maze:
             
             if curr == self._endpoint:
                 break
-
+            
             #pQ = PriorityQueue()
             for i in range(4):
                 row = curr[0] + rowNum[i]
@@ -323,15 +327,13 @@ class Maze:
             width = len(self._maze[0])*width_square + 2*len(self._maze[0])
             height = len(self._maze)*width_square + 2*len(self._maze)
             return (width, height)
-        pygame.init()
+
         pygame.display.set_caption("Miku")
         screen = pygame.display.set_mode(
             get_display_resolution(), pygame.RESIZABLE)
-        font = pygame.font.SysFont('Raleway Bold', 30)
 
         x = y = 0
         walls = []
-        bonus_rect = []
         for row in self._maze:
             for col in row:
                 if col == "x":
@@ -339,22 +341,17 @@ class Maze:
                 if col == "S":
                     start_rect = pygame.Rect(x, y, 40, 40)
                 if col == "+":
-                    bonus_rect.append(pygame.Rect(x+10, y+10, 20, 20))
+                    bonus_rect = pygame.Rect(x+10, y+10, 20, 20)
                 x += 42
             y += 42
             x = 0
         end_rect = pygame.Rect(
             self._endpoint[1]*42, self._endpoint[0]*42, 40, 40)
-        img1 = font.render('Exit', True, green)
+
         visited_rects = []
-        if (isinstance(self._visited, list)):
-            for visit in self._visited:
-                visited_rects.append(pygame.Rect(
-                    visit[1]*42, visit[0]*42, 40, 40))  # here
-        else:
-            for visit in self._visited:
-                visited_rects.append(pygame.Rect(
-                    visit[1][1]*42, visit[1][0]*42, 40, 40))  # here
+        for visit in self._visited:
+            visited_rects.append(pygame.Rect(
+                visit[1][1]*42, visit[1][0]*42, 40, 40))  # here
 
         path_rects = []
         for route in self._route:
@@ -377,11 +374,7 @@ class Maze:
                 pygame.draw.rect(screen, white, wall.rect)
             pygame.draw.rect(screen, black, end_rect)
             pygame.draw.rect(screen, red, start_rect)
-            if bonus_rect != None:
-                for bonus in bonus_rect:
-                    pygame.draw.rect(screen, green, bonus)
-            screen.blit(
-                img1, (self._endpoint[1]*42+10, self._endpoint[0]*42+10))
+            pygame.draw.rect(screen, green, bonus_rect)
             if not traversal:
                 pygame.display.flip()
                 for visited_rect in visited_rects:
@@ -394,21 +387,13 @@ class Maze:
                         pygame.draw.rect(screen, blue, route)
                         pygame.display.flip()
                         clock.tick(60)
-                    for route in range(len(self._route)-1):
-                        print(self._route[route])
-                        pygame.draw.line(screen, black, (self._route[route][1]*42+10,self._route[route][0]*42+10), (self._route[route+1][1]*42+10,self._route[route+1][0]*42+10), 5)
-                        pygame.display.update()
-                        clock.tick(60)
-                screen.blit(
-                    img1, (self._endpoint[1]*42+10, self._endpoint[0]*42+10))
-                namefile = name.split('/')
-                pygame.image.save(screen, "output/" + self._name+ "/" + namefile[-1] + "/" + f"{self._name}_{namefile[-1]}" + ".jpg")
-                break
-        pygame.quit()
-
+                pygame.image.save(screen, "output/hinhanh.png")
+                pygame.quit()
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
         # myScreenshot.save("output/hinhanh.png")
+
+        pygame.quit()
 
 
 def get_data_from_file(file_name: str):
@@ -416,10 +401,9 @@ def get_data_from_file(file_name: str):
     with open(directory, 'r') as f:
         n_bonus_points = int(next(f)[:-1])
         bonus_points = []
-        if n_bonus_points != 0:
-            for i in range(n_bonus_points):
-                x, y, reward = map(int, next(f)[:-1].split(' '))
-                bonus_points.append({"dir": (x, y), "reward": reward})
+        for i in range(n_bonus_points):
+            x, y, reward = map(int, next(f)[:-1].split(' '))
+            bonus_points.append({"dir": (x, y), "reward": reward})
         text = f.read()
         matrix = [list(i) for i in text.splitlines()]
 
