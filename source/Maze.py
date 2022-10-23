@@ -223,21 +223,30 @@ class Maze:
                     pass
 
     def isValid(self, row: int, col: int):
-        return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '
-
-    def heuristics(self, point, name: str):
-        if name == "Manhanttan":  # Khoảng cách Manhanttan
+        return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '  
+        
+    def heuristics(self, point, name: str) -> float:
+        if name == "Manhanttan": # Khoảng cách Manhanttan
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
-            # chọn D = 1 là chi phí tối thiểu để di chuyển sang một ô liền kề
-            return 1*(dx+dy)
+            return 1*(dx+dy) # chọn D = 1 là chi phí tối thiểu để di chuyển sang một ô liền kề
         elif name == "Euclidean":
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
-            return floor(1 * sqrt(dx * dx + dy * dy))
+            return floor(1* sqrt(dx * dx + dy * dy))
+        elif name == "Chebyshev":
+            D, D2 = 1, 1  # D2 = 1 -> Chebyshev , D2 = sqrt(2) -> Octile
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        elif name == "Octile":
+            D, D2 = 1, sqrt(2)  # D2 = 1 -> Chebyshev , D2 = sqrt(2) -> Octile
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
 
     def gbfs(self):
-
+        
         pQ = PriorityQueue()
         self._visited = {}
         self._route = []
@@ -250,7 +259,7 @@ class Maze:
             
             if curr == self._endpoint:
                 break
-
+            
             #pQ = PriorityQueue()
             for i in range(4):
                 row = curr[0] + rowNum[i]
@@ -259,10 +268,10 @@ class Maze:
                 point = (row,col)
                 if (self.isValid(row,col) and point not in self._visited):
                     #self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))  
-                    priority = self.heuristics((row,col),"Octile") 
+                    priority = self.heuristics((row,col),"Manhanttan") 
                     self._visited[point] = (curr[0],curr[1])
-                    pQ.put(point)
-        self.backward()
+                    pQ.put((priority,point))
+        self._route = self.backward()
         #print(self._route)
     
     def backward(self):
@@ -410,7 +419,10 @@ class Maze:
         # myScreenshot.save("output/hinhanh.png")
 
 
-def get_data_from_file(file_name: str):
+def get_data_from_file(filename):
+    file_name = ""
+    for text in filename:
+        file_name+=text
     directory = mc.get_dir(file_name)
     with open(directory, 'r') as f:
         n_bonus_points = int(next(f)[:-1])

@@ -1,5 +1,6 @@
 import os
 def get_dir(filename):
+    print(filename)
     fileDir = os.path.dirname(os.path.realpath('__file__'))
     directory = os.path.join(fileDir, f'input/{filename}')
     return directory
