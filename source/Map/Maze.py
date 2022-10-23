@@ -241,6 +241,17 @@ class Maze:
             dy = abs(point[1] - self._endpoint[1])
             return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
     
+    def backward(self):
+        route = []
+        curr = self._endpoint
+        self._route = []
+        while curr != self._startpoint:
+            route.append(curr)
+            curr = self._visited[curr]
+        route.append(self._startpoint)
+        route.reverse()
+        return route
+    
     def gbfs(self):
         
         pQ = PriorityQueue()
@@ -269,17 +280,6 @@ class Maze:
                     pQ.put((priority,point))
         self._route = self.backward()
         #print(self._route)
-    
-    def backward(self):
-        route = []
-        curr = self._endpoint
-        self._route = []
-        while curr != self._startpoint:
-            route.append(curr)
-            curr = self._visited[curr]
-        route.append(self._startpoint)
-        route.reverse()
-        return route
         
     def astar(self):
         pQ = PriorityQueue()
