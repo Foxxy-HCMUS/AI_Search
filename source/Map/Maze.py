@@ -15,7 +15,7 @@ import MazeCreated as mc
 import pygame
 import os
 from operator import itemgetter
-import pyautogui
+#import pyautogui
 # Global Variable
 width_square = 40
 # mã màu
@@ -246,11 +246,11 @@ class Maze:
         self._visited = {}
         self._route = []
         #self._visited[self._startpoint] = (self._startpoint)
-        self._visited[(0,self._startpoint)] = (0,self._startpoint)
+        self._visited[(self._startpoint)] = (self._startpoint)
         pQ.put((0,self._startpoint))
         while not pQ.empty():
             curr = pQ.get()[1]
-            self._route.append(curr)
+            #self._route.append(curr)
             
             if curr == self._endpoint:
                 break
@@ -260,39 +260,67 @@ class Maze:
                 row = curr[0] + rowNum[i]
                 col = curr[1] + colNum[i]
 
-                point = self.heuristics((row,col),"Octile"),(row,col)
+                point = (row,col)
                 if (self.isValid(row,col) and point not in self._visited):
-                    self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))   
+                    #self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))  
+                    priority = self.heuristics((row,col),"Octile") 
+                    self._visited[point] = (curr[0],curr[1])
                     pQ.put(point)
-  
-        print(self._route)
+        self.backward()
+        #print(self._route)
+    
+    def backward(self):
+        curr = self._endpoint
+        self._route = []
+        while curr != self._startpoint:
+            self._route.append(curr)
+            curr = self._visited[curr]
+        self._route.append(self._startpoint)
+        self._route.reverse()
         
     def astar(self):
         pQ = PriorityQueue()
         pQ.put((0,self._startpoint))
         self._visited = {}
+        self._visited[(self._startpoint)] = (-1,-1)
         self._route = []    
         cost_so_far = {}
-        cost_so_far[self._startpoint] = 0
+        cost_so_far[(self._startpoint)] = 0
         
+        closed = []
         # self._startpoint.g = 0
         # self._startpoint.h = 0
-        self._visited[(self._startpoint)] = self._startpoint
+        #self._visited[(self._startpoint)] = self._startpoint
         
         while not pQ.empty():
             curr = pQ.get()[1]
             
+            closed.append(curr)
+            a = curr[0]
+            b = curr[1]
             if curr == self._endpoint:
-                break
+                while a != -1:
+                    self._route.append((a, b))
+                    a, b = self._visited[(a,b)]
+                    #print(a)
+                    self._route.reverse()
+                    break
             for i in range(4):
                 row = curr[0] + rowNum[i]
                 col = curr[1] + colNum[i]
                 
-                new_cost =cost_so_far[curr] + self.heuristics((row,col),"Octile")
-                if (self.isValid(row,col) and (row,col) not in self._visited ):
-                    cost_so_far[(row,col)] = new_cost
+                cost =cost_so_far[curr] + 1
+                # check = any((row, col) in item for item in pQ.queue)
+                # if check==True and cost < cost_so_far[(row,col)]: # if neighbor in open 
+                #     pQ.queue.remove((cost_so_far[(row,col)],(row,col))) # remove neighbor from open
+                if (row,col) in closed and cost < cost_so_far[(row,col)]: 
+                    closed.pop((row,col))
+                if self.isValid(row,col) and (row,col) not in self._visited:#and not any((row, col) in item for item in pQ.queue)):
+                    cost_so_far[(row,col)] = cost
                     self._visited[(row,col)] = (curr[0],curr[1])
+                    new_cost = cost_so_far[(row,col)] + self.heuristics((row,col),"Octile")
                     pQ.put(new_cost,(row,col))  
+        
 
     def run_game(self):
         def get_display_resolution():
@@ -352,11 +380,7 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-<<<<<<< HEAD
                     clock.tick(10)
-=======
-                    clock.tick(30)
->>>>>>> 2659e1a913b24f5863e30d8938311303ac2842c1
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
@@ -402,5 +426,5 @@ def get_data_from_file(file_name: str):
 # main
 bonus, matrix, start_point, end_point = get_data_from_file("text1.txt")
 maze = Maze(matrix, bonus, start_point, end_point)
-maze.dfs()
+maze.gbfs()
 maze.run_game()
