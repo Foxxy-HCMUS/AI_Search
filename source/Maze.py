@@ -29,6 +29,7 @@ blue = (0, 0, 255)
 rowNum = [-1, 0, 0, 1]
 colNum = [0, -1, 1, 0]
 
+
 class Wall(object):
     def __init__(self, pos):
         self.rect = pygame.Rect(pos[0], pos[1], width_square, width_square)
@@ -42,6 +43,7 @@ class Maze:
         self._endpoint = end_point
 
     def bfs(self):
+        self._name = "bfs"
         start = self._startpoint
         queue = []
         visited = []  # Xác định vị trị đã đi qua
@@ -99,6 +101,7 @@ class Maze:
                     pass
 
     def dfs(self):
+        self._name = "dfs"
         start = self._startpoint
         stack = []
         visited = []  # Xác định vị trị đã đi qua
@@ -156,6 +159,7 @@ class Maze:
                     pass
 
     def ucs(self):
+        self._name = "ucs"
         start = self._startpoint
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
@@ -217,19 +221,20 @@ class Maze:
                                 return
                 else:
                     pass
-                
+
     def isValid(self, row: int, col: int):
-        return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '  
-        
+        return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '
+
     def heuristics(self, point, name: str) -> float:
-        if name == "Manhanttan": # Khoảng cách Manhanttan
+        if name == "Manhanttan":  # Khoảng cách Manhanttan
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
-            return 1*(dx+dy) # chọn D = 1 là chi phí tối thiểu để di chuyển sang một ô liền kề
+            # chọn D = 1 là chi phí tối thiểu để di chuyển sang một ô liền kề
+            return 1*(dx+dy)
         elif name == "Euclidean":
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
-            return floor(1* sqrt(dx * dx + dy * dy))
+            return floor(1 * sqrt(dx * dx + dy * dy))
         elif name == "Chebyshev":
             D, D2 = 1, 1  # D2 = 1 -> Chebyshev , D2 = sqrt(2) -> Octile
             dx = abs(point[0] - self._endpoint[0])
@@ -254,53 +259,54 @@ class Maze:
 
     def gbfs(self):
         self._name = "gbfs"
-        
+
         pQ = PriorityQueue()
         self._visited = {}
         self._route = []
         #self._visited[self._startpoint] = (self._startpoint)
         self._visited[(self._startpoint)] = (self._startpoint)
-        pQ.put((0,self._startpoint))
+        pQ.put((0, self._startpoint))
         while not pQ.empty():
             curr = pQ.get()[1]
-            #self._route.append(curr)
-            
+            # self._route.append(curr)
+
             if curr == self._endpoint:
                 break
-            
+
             #pQ = PriorityQueue()
             for i in range(4):
                 row = curr[0] + rowNum[i]
                 col = curr[1] + colNum[i]
 
-                point = (row,col)
-                if (self.isValid(row,col) and point not in self._visited):
-                    #self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))  
-                    priority = self.heuristics((row,col),"Manhanttan") 
-                    self._visited[point] = (curr[0],curr[1])
-                    pQ.put((priority,point))
+                point = (row, col)
+                if (self.isValid(row, col) and point not in self._visited):
+                    #self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))
+                    priority = self.heuristics((row, col), "Manhanttan")
+                    self._visited[point] = (curr[0], curr[1])
+                    pQ.put((priority, point))
         self._route = self.backward()
-        #print(self._route)
-        
+        # print(self._route)
+
     def astar(self):
+        self._name = "astar"
         pQ = PriorityQueue()
-        pQ.put((0,self._startpoint))
-        
+        pQ.put((0, self._startpoint))
+
         self._visited = {}
         self._visited[(self._startpoint)] = None
-        
-        self._route = []    
+
+        self._route = []
         cost_so_far = {}
         cost_so_far[self._startpoint] = 0
-        
+
         closed = []
         # self._startpoint.g = 0
         # self._startpoint.h = 0
         #self._visited[(self._startpoint)] = self._startpoint
-        
+
         while not pQ.empty():
             curr = pQ.get()[1]
-            
+
             closed.append(curr)
             a = curr[0]
             b = curr[1]
@@ -309,15 +315,14 @@ class Maze:
             for i in range(4):
                 row = curr[0] + rowNum[i]
                 col = curr[1] + colNum[i]
-                
-                cost =cost_so_far[curr] + 1
-                if self.isValid(row,col) and ((row,col) not in cost_so_far or cost < cost_so_far[row,col]):
-                    cost_so_far[(row,col)] = cost
-                    priority = cost + self.heuristics((row,col),"Manhanttan")
-                    pQ.put((priority,(row,col)))
-                    self._visited[(row,col)] = (curr[0],curr[1])
+
+                cost = cost_so_far[curr] + 1
+                if self.isValid(row, col) and ((row, col) not in cost_so_far or cost < cost_so_far[row, col]):
+                    cost_so_far[(row, col)] = cost
+                    priority = cost + self.heuristics((row, col), "Manhanttan")
+                    pQ.put((priority, (row, col)))
+                    self._visited[(row, col)] = (curr[0], curr[1])
         self._route = self.backward()
-        
 
     def run_game(self, name):
         def get_display_resolution():
@@ -334,7 +339,7 @@ class Maze:
         text = font.render('Exit', True, green)
         x = y = 0
         walls = []
-        bonus_rect =[]
+        bonus_rect = []
         for row in self._maze:
             for col in row:
                 if col == "x":
@@ -375,10 +380,10 @@ class Maze:
                 pygame.draw.rect(screen, white, wall.rect)
             pygame.draw.rect(screen, black, end_rect)
             pygame.draw.rect(screen, red, start_rect)
-            if bonus_rect !=None:
+            if bonus_rect != None:
                 for bonus in bonus_rect:
                     pygame.draw.rect(screen, green, bonus)
-            screen.blit(text,(self._endpoint[1]*42+5, self._endpoint[0]*42+5))
+            screen.blit(text, (self._endpoint[1]*42+5, self._endpoint[0]*42+5))
             if not traversal:
                 pygame.display.flip()
                 for visited_rect in visited_rects:
@@ -391,11 +396,14 @@ class Maze:
                         pygame.draw.rect(screen, blue, route)
                         pygame.display.flip()
                         clock.tick(60)
-                    screen.blit(text,(self._endpoint[1]*42+5, self._endpoint[0]*42+5))
+                    screen.blit(
+                        text, (self._endpoint[1]*42+5, self._endpoint[0]*42+5))
                     for route in range(len(self._route)-1):
-                        pygame.draw.line(screen, black, (self._route[route][1]*42+10,self._route[route][0]*42+10),(self._route[route+1][1]*42+10,self._route[route+1][0]*42+10) , 5)
+                        pygame.draw.line(screen, black, (self._route[route][1]*42+10, self._route[route][0]*42+10), (
+                            self._route[route+1][1]*42+10, self._route[route+1][0]*42+10), 5)
                         pygame.display.update()
-                pygame.image.save(screen, "output/" + self._name + "/" + f"{self._name}_{name}.jpg")
+                pygame.image.save(screen, "output/" + self._name +
+                                  "/" + name[0] + "/" + f"{self._name}_{name[0]}_{name[1]}.jpg")
                 break
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
@@ -430,4 +438,3 @@ def get_data_from_file(file_name):
 
         start_point, end_point = find_start_end()
     return bonus_points, matrix, start_point, end_point
-
