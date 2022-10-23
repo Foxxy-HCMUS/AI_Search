@@ -192,7 +192,7 @@ class Maze:
     def isValid(self, row: int, col: int):
         return (row >= 0) and (row < len(self._maze)) and (col >= 0) and (col < len(self._maze[0])) and self._maze[row][col] == ' '  
         
-    def heuristics(self, point, name: str):
+    def heuristics(self, point, name: str) -> float:
         if name == "Manhanttan": # Khoảng cách Manhanttan
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
@@ -201,6 +201,16 @@ class Maze:
             dx = abs(point[0] - self._endpoint[0])
             dy = abs(point[1] - self._endpoint[1])
             return floor(1* sqrt(dx * dx + dy * dy))
+        elif name == "Chebyshev":
+            D, D2 = 1, 1  # D2 = 1 -> Chebyshev , D2 = sqrt(2) -> Octile
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        elif name == "Octile":
+            D, D2 = 1, sqrt(2)  # D2 = 1 -> Chebyshev , D2 = sqrt(2) -> Octile
+            dx = abs(point[0] - self._endpoint[0])
+            dy = abs(point[1] - self._endpoint[1])
+            return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
     
     def gbfs(self):
         
@@ -222,12 +232,39 @@ class Maze:
                 row = curr[0] + rowNum[i]
                 col = curr[1] + colNum[i]
 
-                point = self.heuristics((row,col),"Euclidean"),(row,col)
+                point = self.heuristics((row,col),"Octile"),(row,col)
                 if (self.isValid(row,col) and point not in self._visited):
-                    self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Euclidean"),(curr[0],curr[1]))   
+                    self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))   
                     pQ.put(point)
   
-        print(self._visited)
+        print(self._route)
+        
+    def astar(self):
+        pQ = PriorityQueue()
+        pQ.put((0,self._startpoint))
+        self._visited = {}
+        self._route = []    
+        cost_so_far = {}
+        cost_so_far[self._startpoint] = 0
+        
+        # self._startpoint.g = 0
+        # self._startpoint.h = 0
+        self._visited[(self._startpoint)] = self._startpoint
+        
+        while not pQ.empty():
+            curr = pQ.get()[1]
+            
+            if curr == self._endpoint:
+                break
+            for i in range(4):
+                row = curr[0] + rowNum[i]
+                col = curr[1] + colNum[i]
+                
+                new_cost =cost_so_far[curr] + self.heuristics((row,col),"Octile")
+                if (self.isValid(row,col) and (row,col) not in self._visited ):
+                    cost_so_far[(row,col)] = new_cost
+                    self._visited[(row,col)] = (curr[0],curr[1])
+                    pQ.put(new_cost,(row,col))  
 
     def run_game(self):
         def get_display_resolution():
@@ -287,7 +324,7 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(5)
+                    clock.tick(10)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
