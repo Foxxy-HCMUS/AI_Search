@@ -24,6 +24,7 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
+yellow = (255, 255, 0)
 
 rowNum = [-1, 0, 0, 1]
 colNum = [0, -1, 1, 0]
@@ -329,19 +330,31 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(10)
+                    clock.tick(50)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
                         pygame.draw.rect(screen, blue, route)
                         pygame.display.flip()
                         clock.tick(60)
+                    for route in range(len(self._route)-1):
+                        print(self._route[route])
+                        pygame.draw.line(screen, black, (self._route[route][1]*42+10,self._route[route][0]*42+10), (self._route[route+1][1]*42+10,self._route[route+1][0]*42+10), 5)
+                        pygame.display.update()
+                        clock.tick(60)
+                screen.blit(
+                    img1, (self._endpoint[1]*42+10, self._endpoint[0]*42+10))
+                namefile = name.split('/')
+                namejpg =""
+                for _name in namefile:
+                    namejpg += _name + "_"
+                pygame.image.save(screen, "output/" + name+ "/" + namejpg[:-1] + ".jpg")
+                break
+        pygame.quit()
 
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
         # myScreenshot.save("output/hinhanh.png")
-        pygame.image.save(screen, "output/" + name + ".jpg")
-        pygame.quit()
 
 
 def get_data_from_file(file_name: str):

@@ -12,6 +12,15 @@ def get_directory_file(filename):
     open_file(directory)
     return directory
 
+def output():
+    os.mkdir("output")
+    os.makedirs("output/bfs/level_1")
+    os.makedirs("output/dfs/level_1")
+    os.makedirs("output/ucs/level_1")
+    os.makedirs("output/gbfs/level_1")
+    os.makedirs("output/astar/level_1")
+
+
 #main
 def create_Map(name):
     with open(get_directory_file( name), 'w') as outfile:
