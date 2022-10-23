@@ -13,6 +13,7 @@ import MazeCreated as mc
 import pygame
 import os
 from operator import itemgetter
+import pyautogui
 # Global Variable
 width_square = 40
 # mã màu
@@ -40,25 +41,38 @@ class Maze:
         queue = []
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
+        go = []
 
         # BFS
-        queue.append(start)
+        queue.append({"nextdir": start, "curdir": start})
         visited.append({"nextdir": start, "curdir": "start"})
-
         while queue:
             directions = []
-            pop_value = queue.pop(0)
-            if pop_value not in self._visited:
-                self._visited.append(pop_value)
-            directions.append((pop_value[0], pop_value[1]-1))  # LEFT
-            directions.append((pop_value[0]+1, pop_value[1]))  # DOWN
-            directions.append((pop_value[0], pop_value[1]+1))  # RIGHT
-            directions.append((pop_value[0]-1, pop_value[1]))  # UP
+            while (True):
+                pop_value = queue.pop(0)
+                if pop_value["nextdir"] not in self._visited:
+                    self._visited.append(pop_value["nextdir"])
+                    go.append(
+                        {"nextdir": pop_value["nextdir"], "curdir": pop_value["curdir"]})
+                    break
+                else:
+                    pop_value = None
+
+            directions.append(
+                (pop_value["nextdir"][0], pop_value["nextdir"][1]-1))  # LEFT
+            directions.append(
+                (pop_value["nextdir"][0]+1, pop_value["nextdir"][1]))  # DOWN
+            directions.append(
+                (pop_value["nextdir"][0], pop_value["nextdir"][1]+1))  # RIGHT
+            directions.append(
+                (pop_value["nextdir"][0]-1, pop_value["nextdir"][1]))  # UP
 
             for nextdir in directions:
                 if self._maze[nextdir[0]][nextdir[1]] != "x" and nextdir not in self._visited:
-                    visited.append({"nextdir": nextdir, "curdir": pop_value})
-                    queue.append(nextdir)
+                    queue.append(
+                        {"nextdir": nextdir, "curdir": pop_value["nextdir"]})
+                    visited.append(
+                        {"nextdir": nextdir, "curdir": pop_value["nextdir"]})
                     # self._visited.append(nextdir)
                     if self._endpoint == nextdir:
                         print("success")
@@ -66,11 +80,11 @@ class Maze:
                         self._route = []
                         self._route.append(self._endpoint)
                         self._visited.append(self._endpoint)
-                        before_current = visited[len(visited)-1]["curdir"]
+                        before_current = go[len(go)-1]["nextdir"]
                         while (True):
                             self._route.append(before_current)
                             before_current = [
-                                i["curdir"] for i in visited if i["nextdir"] == before_current]
+                                i["curdir"] for i in go if i["nextdir"] == before_current]
                             before_current = before_current[0]
                             if (before_current == self._startpoint):
                                 self._route.append(self._startpoint)
@@ -88,27 +102,34 @@ class Maze:
         # DFS
         stack.append({"nextdir": start, "curdir": start})
         visited.append({"nextdir": start, "curdir": "start"})
-        go =[]
+        go = []
         while stack:
             directions = []
-            while(True):
+            while (True):
                 pop_value = stack.pop(-1)
                 if pop_value["nextdir"] not in self._visited:
                     self._visited.append(pop_value["nextdir"])
-                    go.append({"nextdir": pop_value["nextdir"], "curdir": pop_value["curdir"]})
+                    go.append(
+                        {"nextdir": pop_value["nextdir"], "curdir": pop_value["curdir"]})
                     break
                 else:
                     pop_value = None
-            directions.insert(0, (pop_value["nextdir"][0], pop_value["nextdir"][1]-1))  # LEFT
-            directions.insert(1, (pop_value["nextdir"][0]+1, pop_value["nextdir"][1]))  # DOWN
-            directions.insert(2, (pop_value["nextdir"][0], pop_value["nextdir"][1]+1))  # RIGHT
-            directions.insert(3, (pop_value["nextdir"][0]-1, pop_value["nextdir"][1]))  # UP
+            directions.insert(
+                0, (pop_value["nextdir"][0], pop_value["nextdir"][1]-1))  # LEFT
+            directions.insert(
+                1, (pop_value["nextdir"][0]+1, pop_value["nextdir"][1]))  # DOWN
+            directions.insert(
+                2, (pop_value["nextdir"][0], pop_value["nextdir"][1]+1))  # RIGHT
+            directions.insert(
+                3, (pop_value["nextdir"][0]-1, pop_value["nextdir"][1]))  # UP
 
             count = 0
             for nextdir in directions:
                 if self._maze[nextdir[0]][nextdir[1]] != "x" and nextdir not in self._visited:
-                    stack.insert(len(stack)-count, {"nextdir": nextdir, "curdir": pop_value["nextdir"]})
-                    visited.append({"nextdir": nextdir, "curdir": pop_value["nextdir"]})
+                    stack.insert(
+                        len(stack)-count, {"nextdir": nextdir, "curdir": pop_value["nextdir"]})
+                    visited.append(
+                        {"nextdir": nextdir, "curdir": pop_value["nextdir"]})
                     count += 1
                     if self._endpoint == nextdir:
                         print("success")
@@ -138,23 +159,28 @@ class Maze:
         bonusreward = [i["reward"] for i in self._bonus]
         queue.append({"nextdir": start, "curdir": start, "cost": 0}),
         cost = 0
-        go =[]
+        go = []
         while (True):
             directions = []
             queue = sorted(queue, key=itemgetter('cost'))
-            while(True):
+            while (True):
                 pop_value = queue.pop(0)
                 if pop_value["nextdir"] not in self._visited:
                     self._visited.append(pop_value["nextdir"])
-                    go.append({"nextdir": pop_value["nextdir"], "curdir": pop_value["curdir"]})
+                    go.append(
+                        {"nextdir": pop_value["nextdir"], "curdir": pop_value["curdir"]})
                     break
                 else:
                     pop_value = None
 
-            directions.append((pop_value["nextdir"][0], pop_value["nextdir"][1]-1))  # LEFT
-            directions.append((pop_value["nextdir"][0]+1, pop_value["nextdir"][1]))  # DOWN
-            directions.append((pop_value["nextdir"][0], pop_value["nextdir"][1]+1))  # RIGHT
-            directions.append((pop_value["nextdir"][0]-1, pop_value["nextdir"][1]))  # UP
+            directions.append(
+                (pop_value["nextdir"][0], pop_value["nextdir"][1]-1))  # LEFT
+            directions.append(
+                (pop_value["nextdir"][0]+1, pop_value["nextdir"][1]))  # DOWN
+            directions.append(
+                (pop_value["nextdir"][0], pop_value["nextdir"][1]+1))  # RIGHT
+            directions.append(
+                (pop_value["nextdir"][0]-1, pop_value["nextdir"][1]))  # UP
 
             for nextdir in directions:
                 if self._maze[nextdir[0]][nextdir[1]] != "x" and nextdir not in self._visited:
@@ -163,9 +189,11 @@ class Maze:
                         i = bonusdir.index(nextdir)
                         cost += bonusreward[i]
                     else:
-                        cost+=1
-                    visited.append({"nextdir": nextdir, "curdir": pop_value["nextdir"], "cost": cost})
-                    queue.append({"nextdir": nextdir, "curdir": pop_value["nextdir"], "cost": cost})
+                        cost += 1
+                    visited.append(
+                        {"nextdir": nextdir, "curdir": pop_value["nextdir"], "cost": cost})
+                    queue.append(
+                        {"nextdir": nextdir, "curdir": pop_value["nextdir"], "cost": cost})
                     if self._endpoint == nextdir:
                         print("success")
                         # Lấy vị trí cuối cùng
@@ -243,14 +271,19 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(5)
+                    clock.tick(30)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
                         pygame.draw.rect(screen, blue, route)
                         pygame.display.flip()
                         clock.tick(60)
+                pygame.image.save(screen, "output/hinhanh.png")
+                pygame.quit()
             # pygame.display.flip()
+        # myScreenshot = pyautogui.screenshot()
+        # myScreenshot.save("output/hinhanh.png")
+
         pygame.quit()
 
 
@@ -284,5 +317,5 @@ def get_data_from_file(file_name: str):
 # main
 bonus, matrix, start_point, end_point = get_data_from_file("text1.txt")
 maze = Maze(matrix, bonus, start_point, end_point)
-maze.ucs()
+maze.dfs()
 maze.run_game()
