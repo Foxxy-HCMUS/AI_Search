@@ -43,6 +43,7 @@ class Maze:
         self._endpoint = end_point
 
     def bfs(self):
+        self._name = "bfs"
         start = self._startpoint
         queue = []
         visited = []  # Xác định vị trị đã đi qua
@@ -100,6 +101,7 @@ class Maze:
                     pass
 
     def dfs(self):
+        self._name = "dfs"
         start = self._startpoint
         stack = []
         visited = []  # Xác định vị trị đã đi qua
@@ -157,6 +159,7 @@ class Maze:
                     pass
 
     def ucs(self):
+        self._name = "ucs"
         start = self._startpoint
         visited = []  # Xác định vị trị đã đi qua
         self._visited = []
@@ -345,10 +348,7 @@ class Maze:
                 screen.blit(
                     img1, (self._endpoint[1]*42+10, self._endpoint[0]*42+10))
                 namefile = name.split('/')
-                namejpg =""
-                for _name in namefile:
-                    namejpg += _name + "_"
-                pygame.image.save(screen, "output/" + name+ "/" + namejpg[:-1] + ".jpg")
+                pygame.image.save(screen, "output/" + self._name+ "/" + namefile[-1] + "/" + f"{self._name}_{namefile[-1]}" + ".jpg")
                 break
         pygame.quit()
 

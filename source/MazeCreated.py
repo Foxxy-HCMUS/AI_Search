@@ -1,7 +1,7 @@
 import os
 def get_dir(filename):
     fileDir = os.path.dirname(os.path.realpath('__file__'))
-    directory = os.path.join(fileDir, 'input/{0}'.format(filename))
+    directory = os.path.join(fileDir, f'input/{filename}')
     return directory
 
 def get_directory_file(filename):
@@ -22,8 +22,13 @@ def output():
 
 
 #main
-def create_Map(name):
-    with open(get_directory_file( name), 'w') as outfile:
+def create_Map_Lv1():
+    try:
+        os.makedirs("input/level_1")
+    except:
+        pass
+    path = "level_1/"
+    with open(get_directory_file(path + "text1.txt"), 'w') as outfile:
         outfile.write('0\n')
         outfile.write('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n')
         outfile.write('x    S                            x\n')
