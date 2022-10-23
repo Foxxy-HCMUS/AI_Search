@@ -10,6 +10,7 @@ Maze.py có các chức năng như:
 # import matplotlib.pyplot as plt
 from math import floor, sqrt
 from queue import PriorityQueue
+from turtle import backward
 from numpy import square
 import MazeCreated as mc
 import pygame
@@ -263,29 +264,33 @@ class Maze:
                 point = (row,col)
                 if (self.isValid(row,col) and point not in self._visited):
                     #self._visited[(point)] = (self.heuristics((curr[0],curr[1]),"Octile"),(curr[0],curr[1]))  
-                    priority = self.heuristics((row,col),"Octile") 
+                    priority = self.heuristics((row,col),"Manhanttan") 
                     self._visited[point] = (curr[0],curr[1])
-                    pQ.put(point)
-        self.backward()
+                    pQ.put((priority,point))
+        self._route = self.backward()
         #print(self._route)
     
     def backward(self):
+        route = []
         curr = self._endpoint
         self._route = []
         while curr != self._startpoint:
-            self._route.append(curr)
+            route.append(curr)
             curr = self._visited[curr]
-        self._route.append(self._startpoint)
-        self._route.reverse()
+        route.append(self._startpoint)
+        route.reverse()
+        return route
         
     def astar(self):
         pQ = PriorityQueue()
         pQ.put((0,self._startpoint))
+        
         self._visited = {}
-        self._visited[(self._startpoint)] = (-1,-1)
+        self._visited[(self._startpoint)] = None
+        
         self._route = []    
         cost_so_far = {}
-        cost_so_far[(self._startpoint)] = 0
+        cost_so_far[self._startpoint] = 0
         
         closed = []
         # self._startpoint.g = 0
@@ -299,27 +304,18 @@ class Maze:
             a = curr[0]
             b = curr[1]
             if curr == self._endpoint:
-                while a != -1:
-                    self._route.append((a, b))
-                    a, b = self._visited[(a,b)]
-                    #print(a)
-                    self._route.reverse()
-                    break
+                break
             for i in range(4):
                 row = curr[0] + rowNum[i]
                 col = curr[1] + colNum[i]
                 
                 cost =cost_so_far[curr] + 1
-                # check = any((row, col) in item for item in pQ.queue)
-                # if check==True and cost < cost_so_far[(row,col)]: # if neighbor in open 
-                #     pQ.queue.remove((cost_so_far[(row,col)],(row,col))) # remove neighbor from open
-                if (row,col) in closed and cost < cost_so_far[(row,col)]: 
-                    closed.pop((row,col))
-                if self.isValid(row,col) and (row,col) not in self._visited:#and not any((row, col) in item for item in pQ.queue)):
+                if self.isValid(row,col) and ((row,col) not in cost_so_far or cost < cost_so_far[row,col]):
                     cost_so_far[(row,col)] = cost
+                    priority = cost + self.heuristics((row,col),"Manhanttan")
+                    pQ.put((priority,(row,col)))
                     self._visited[(row,col)] = (curr[0],curr[1])
-                    new_cost = cost_so_far[(row,col)] + self.heuristics((row,col),"Octile")
-                    pQ.put(new_cost,(row,col))  
+        self._route = self.backward()
         
 
     def run_game(self):
@@ -351,7 +347,7 @@ class Maze:
         visited_rects = []
         for visit in self._visited:
             visited_rects.append(pygame.Rect(
-                visit[1][1]*42, visit[1][0]*42, 40, 40))  # here
+                visit[1]*42, visit[0]*42, 40, 40))  # here
 
         path_rects = []
         for route in self._route:
@@ -388,7 +384,6 @@ class Maze:
                         pygame.display.flip()
                         clock.tick(60)
                 pygame.image.save(screen, "output/hinhanh.png")
-                pygame.quit()
             # pygame.display.flip()
         # myScreenshot = pyautogui.screenshot()
         # myScreenshot.save("output/hinhanh.png")
@@ -424,7 +419,7 @@ def get_data_from_file(file_name: str):
 
 
 # main
-bonus, matrix, start_point, end_point = get_data_from_file("text1.txt")
+bonus, matrix, start_point, end_point = get_data_from_file("./input/text1.txt")
 maze = Maze(matrix, bonus, start_point, end_point)
-maze.gbfs()
+maze.astar()
 maze.run_game()
