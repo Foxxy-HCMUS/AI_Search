@@ -363,7 +363,7 @@ class Maze:
         else:
             for visit in self._visited:
                 visited_rects.append(pygame.Rect(
-                    visit[1][1]*42, visit[1][0]*42, 40, 40))  # here
+                    visit.key()[1]*42, visit.key()[0]*42, 40, 40))  # here
 
         path_rects = []
         for route in self._route:
@@ -396,7 +396,7 @@ class Maze:
                 for visited_rect in visited_rects:
                     pygame.draw.rect(screen, red, visited_rect)
                     pygame.display.flip()
-                    clock.tick(10)
+                    clock.tick(50)
                 traversal = True
                 if (not finish) and traversal:
                     for route in path_rects:
@@ -419,10 +419,7 @@ class Maze:
         # myScreenshot.save("output/hinhanh.png")
 
 
-def get_data_from_file(filename):
-    file_name = ""
-    for text in filename:
-        file_name+=text
+def get_data_from_file(file_name):
     directory = mc.get_dir(file_name)
     with open(directory, 'r') as f:
         n_bonus_points = int(next(f)[:-1])
@@ -449,9 +446,3 @@ def get_data_from_file(filename):
         start_point, end_point = find_start_end()
     return bonus_points, matrix, start_point, end_point
 
-
-# main
-bonus, matrix, start_point, end_point = get_data_from_file("text1.txt")
-maze = Maze(matrix, bonus, start_point, end_point)
-maze.gbfs()
-maze.run_game()
